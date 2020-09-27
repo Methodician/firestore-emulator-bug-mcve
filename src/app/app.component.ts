@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
-import * as fb from 'firebase/app';
+
+import { initFb ,getDb} from '../fb';
+
+initFb();
+const db = getDb();
+
 
 @Component({
   selector: 'app-root',
@@ -21,7 +26,10 @@ import * as fb from 'firebase/app';
         <h2><button (click)="addInvisibleDoc()">add invisible doc</button></h2>
       </li>
       <li>
-        <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
+        <h2><button (click)="addVisibleSubDoc()">add visible nested doc</button></h2>
+      </li>
+      <li>
+        <h2><button (click)="setDocToMakeNestVisible()">make nested doc visible</button></h2>
       </li>
     </ul>
     
@@ -31,19 +39,36 @@ import * as fb from 'firebase/app';
 export class AppComponent {
   title = 'emulator-bug-mcve';
   
-  firestore = fb.firestore();
-  visibleInEmulatorCol = this.firestore.collection('visibleCol');
-  invisibleInEmulatorCol = this.firestore.collection('invisibleCol').doc('emptyDoc').collection('invisibleSubCol');
+
+  visibleInEmulatorCol = db.collection('visibleCol');
+  invisibleInEmulatorCol = db.collection('invisibleCol').doc('emptyDoc').collection('invisibleSubCol');
+
+  makeVisibleNestedDoc = db.collection('visibleNestedCol').doc('notEmptyDoc');
+  visibleNestedInEmulatorCol = this.makeVisibleNestedDoc.collection('visibleNestedSub');
   
   ngOnInit() {
+
     this.visibleInEmulatorCol.onSnapshot(snap => {
       const data = snap.docs.map(doc => doc.data());
-      console.log(data);
+      console.log('Visible data', data);
+    })
+
+    this.invisibleInEmulatorCol.onSnapshot(snap => {
+      const data = snap.docs.map(doc => doc.data());
+      console.log('Invisible data', data);
+    })
+    
+    this.visibleNestedInEmulatorCol.onSnapshot(snap => {
+      const data = snap.docs.map(doc => doc.data());
+      console.log('Visible nested data', data);
     })
   }
 
   addVisibleDoc = () => this.visibleInEmulatorCol.add({a: 'thing'});
 
   addInvisibleDoc = () => this.invisibleInEmulatorCol.add({a: 'thing'});
-  
+
+  setDocToMakeNestVisible = () => this.makeVisibleNestedDoc.set({a: 'thing'});
+
+  addVisibleSubDoc = () => this.visibleNestedInEmulatorCol.add({a: 'thing'});
 }
