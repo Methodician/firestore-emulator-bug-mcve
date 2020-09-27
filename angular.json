@@ -105,6 +105,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "emulator-bug-mcve"
+    }
+  },
+  "defaultProject": "emulator-bug-mcve",
+  "cli": {
+    "analytics": "17fc091c-66e0-4c95-8eb6-3262df11757e"
+  }
 }
