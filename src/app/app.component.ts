@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import * as fb from 'firebase';
+import * as fb from 'firebase/app';
 
 @Component({
   selector: 'app-root',
@@ -15,10 +15,10 @@ import * as fb from 'firebase';
     <h2>Here are some links to help you start: </h2>
     <ul>
       <li>
-        <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
+        <h2><button (click)="addVisibleDoc()">add visible doc</button></h2>
       </li>
       <li>
-        <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
+        <h2><button (click)="addInvisibleDoc()">add invisible doc</button></h2>
       </li>
       <li>
         <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
@@ -30,4 +30,20 @@ import * as fb from 'firebase';
 })
 export class AppComponent {
   title = 'emulator-bug-mcve';
+  
+  firestore = fb.firestore();
+  visibleInEmulatorCol = this.firestore.collection('visibleCol');
+  invisibleInEmulatorCol = this.firestore.collection('invisibleCol').doc('emptyDoc').collection('invisibleSubCol');
+  
+  ngOnInit() {
+    this.visibleInEmulatorCol.onSnapshot(snap => {
+      const data = snap.docs.map(doc => doc.data());
+      console.log(data);
+    })
+  }
+
+  addVisibleDoc = () => this.visibleInEmulatorCol.add({a: 'thing'});
+
+  addInvisibleDoc = () => this.invisibleInEmulatorCol.add({a: 'thing'});
+  
 }
